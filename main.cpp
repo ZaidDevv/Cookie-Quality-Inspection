@@ -2,14 +2,13 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
 #include <iostream>
-#include <cmath>
 
-/* Project is done by Zaid Mohammed Hameed & Adithya Narayan Selvaraj  & Nehal Hussain */
+/* Project is done by Zaid Mohammed Hameed & Adithya Narayan Selvaraj & Nehal Hussain */
 
 using namespace cv;
 using namespace std;
 
-//void avgColor(Vec3i c, Mat src, float&, float&, float&);
+//void avgColor(Vec3i c, Mat src, float&, float&, float&); // old approach
 
 int main()
 {
@@ -27,8 +26,8 @@ int main()
 
 	Mat gray;
 	Mat grayRef;
+	medianBlur(src,src,5);
 	cvtColor(src, gray, COLOR_BGR2GRAY);
-	medianBlur(gray, gray, 5);
 
 	HoughCircles(gray, circles, HOUGH_GRADIENT, 1,
 		gray.rows / 16,  // change this value to detect circles with different distances to each other
@@ -40,14 +39,14 @@ int main()
 	cvtColor(myRef, grayRef, COLOR_BGR2GRAY);
 
 	HoughCircles(grayRef, circlesRef, HOUGH_GRADIENT, 1,
-		gray.rows / 16,  // change this value to detect circles with different distances to each other
-		60, 5, 50, 230 // change the last two parameters
+		gray.rows / 16, 
+		60, 5, 50, 230 
 	);
 
 	Vec3i c1 = circlesRef[0];
 	Point centerref = Point(c1[0], c1[1]);
 	//avgColor(c1, myRef, valueGoodCaseAVg, hueGoodCaseAVg, satGoodCaseAVg);
-	circle(myRef, centerref, 1, Scalar(0, 100, 100), 3, LINE_AA);
+	circle(myRef, centerref, 1, Scalar(0, 100, 100), 3, LINE_AA);  // We have used the reference image as a "Good" case to compare color values
 	circle(myRef, centerref, c1[2], Scalar(255, 0, 0), 3, LINE_AA);
 
 	Mat roiRef = myRef(Range(c1[1] - c1[2], c1[1] + c1[2] + 1), Range(c1[0] - c1[2], c1[0] + c1[2] + 1));
@@ -56,12 +55,11 @@ int main()
 
 	for (int i = 0; i < circles.size(); i++)
 	{
-
 		Vec3i c = circles[i];
+		// circle center coordinates x = c[0] , y = c[1]  
 		Point center = Point(c[0], c[1]);
-		// circle center
-		circle(src, center, 1, Scalar(0, 100, 100), 3, LINE_AA);
-		// circle outline
+
+		// circle radius
 		int radius = c[2];
 
 		//avgColor(c, src, valAvg, hueAvg, satAvg);
@@ -77,7 +75,9 @@ int main()
 
 
 		if (avgClr < 103) {
+			// circle center
 			circle(src, center, 1, Scalar(0, 100, 100), 3, LINE_AA);
+			// circle outline
 			circle(src, center, radius, Scalar(255, 0, 0), 3, LINE_AA);
 
 		}
